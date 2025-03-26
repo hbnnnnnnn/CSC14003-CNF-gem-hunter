@@ -161,7 +161,7 @@ def solve_cnf_brute_force(cnf, variables):
                     break
             
             if all_satisfied:
-                print("SAT (Brute Force Optimized)")
+                print("SAT (Brute Force)")
                 model = [var if assignment[var] else -var for var in variables_list]
                 return model
     else:
