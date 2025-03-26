@@ -294,6 +294,7 @@ def measure_time(time_out, func, *args, **kwargs):
         try:
             model = future.result(timeout=time_out)
             elapsed_time = time.perf_counter() - start_time 
+            print(f"Execution time for {func.__name__}: {elapsed_time:.4f} seconds")
             return model, elapsed_time
         except concurrent.futures.TimeoutError:
             print(f"Function {func.__name__} timed out after {time_out} seconds")
