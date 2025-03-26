@@ -1,6 +1,6 @@
 import pygame
 import random
-from main import read_matrix, prepare_cnf_data, solve_cnf, solve_cnf_backtrack, solve_cnf_brute_force, interpret_model
+from main import read_matrix, prepare_cnf_data, solve_cnf_pysat, solve_cnf_backtracking, solve_cnf_brute_force, interpret_model
 pygame.init()
 pygame.mixer.init()
 normal_font = pygame.font.Font('assets/text/Emulogic-zrEw.ttf', 12)
@@ -119,9 +119,9 @@ class Game:
         
     def generate_level(self):
         if self.level >= 5:
-            algorithm = random.choice([solve_cnf, solve_cnf_backtrack])
+            algorithm = random.choice([solve_cnf_pysat, solve_cnf_backtracking])
         else:
-            algorithm = random.choice([solve_cnf, solve_cnf_backtrack, solve_cnf_brute_force])
+            algorithm = random.choice([solve_cnf_pysat, solve_cnf_backtracking, solve_cnf_brute_force])
         self.loading_message = f"Generating puzzle using {algorithm.__name__}..."
         if self.level == 8:
             self.cell_size = 16

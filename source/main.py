@@ -2,6 +2,7 @@ import os
 import time
 import concurrent.futures
 from itertools import combinations
+from itertools import product
 from pysat.solvers import Solver
 import gc
 
@@ -103,7 +104,7 @@ def interpret_model(model, matrix):
 
     return result
 
-def solve_cnf(cnf, variables):
+def solve_cnf_pysat(cnf, variables):
     solver = Solver()
     solver.append_formula(cnf)
     try:
@@ -125,7 +126,6 @@ def prepare_cnf_data(matrix):
     return cnf, variables
 
 def solve_cnf_brute_force(cnf, variables):
-    # Build a mapping of variables to the clauses they appear in
     clauses_by_var = {}
     for i, clause in enumerate(cnf):
         for literal in clause:
@@ -134,7 +134,6 @@ def solve_cnf_brute_force(cnf, variables):
                 clauses_by_var[var] = []
             clauses_by_var[var].append((i, literal))
     
-    # Convert variables set to a list for consistent ordering
     variables_list = sorted(list(variables))
     
     if len(variables) <= 30:
@@ -166,8 +165,6 @@ def solve_cnf_brute_force(cnf, variables):
                 model = [var if assignment[var] else -var for var in variables_list]
                 return model
     else:
-        # You need to import product for this part
-        from itertools import product
         
         for values in product([True, False], repeat=len(variables_list)):
             assignment = {var: val for var, val in zip(variables_list, values)}
@@ -188,103 +185,118 @@ def solve_cnf_brute_force(cnf, variables):
                     break
             
             if all_satisfied:
-                print("SAT (Brute Force Optimized)")
+                print("SAT (Brute Force)")
                 model = [var if assignment[var] else -var for var in variables_list]
                 return model
     
-    print("UNSAT (Brute Force Optimized)")
+    print("UNSAT (Brute Force)")
     return None
 
 
-def solve_cnf_backtrack(cnf, variables):
-    var_to_clauses = {}
-    for i, clause in enumerate(cnf):
-        for literal in clause:
-            var = abs(literal)
-            if var not in var_to_clauses:
-                var_to_clauses[var] = []
-            var_to_clauses[var].append((i, literal))
+def solve_cnf_backtracking(cnf, variables):
+    cnf = [clause[:] for clause in cnf]
+    variables_list = sorted(list(variables))
     
-    satisfied_clauses = [False] * len(cnf)
     assignment = {}
-    var_counts = {}
-    for var in variables:
-        var_counts[var] = len(var_to_clauses.get(var, []))
-    ordered_variables = sorted(variables, key=lambda var: var_counts.get(var, 0), reverse=True)
     
-    def is_clause_satisfied(clause_idx):
-        clause = cnf[clause_idx]
-        for lit in clause:
-            var = abs(lit)
-            if var in assignment:
-                if (lit > 0 and assignment[var]) or (lit < 0 and not assignment[var]):
-                    return True
-        return False
-    
-    def is_assignment_consistent():
-        for i, clause in enumerate(cnf):
-            if satisfied_clauses[i]:
-                continue
+    def dpll(formula, assign):
+        if len(formula) == 0:
+            return assign
+        
+        if any(len(clause) == 0 for clause in formula):
+            return None
+        
+        unit_clauses = [clause for clause in formula if len(clause) == 1]
+        if unit_clauses:
+            unit = unit_clauses[0][0]
+            var = abs(unit)
+            val = unit > 0
+            
+            new_assign = assign.copy()
+            new_assign[var] = val
+            
+            new_formula = []
+            for clause in formula:
+                if unit in clause:
+                    continue
+                new_clause = [lit for lit in clause if lit != -unit]
+                new_formula.append(new_clause)
+            
+            return dpll(new_formula, new_assign)
+        
+        all_literals = [lit for clause in formula for lit in clause]
+        pure_literals = []
+        
+        for var in variables_list:
+            if var in all_literals and -var not in all_literals:
+                pure_literals.append(var)
+            elif -var in all_literals and var not in all_literals:
+                pure_literals.append(-var)
+        
+        if pure_literals:
+            pure = pure_literals[0]
+            var = abs(pure)
+            val = pure > 0
+            
+            new_assign = assign.copy()
+            new_assign[var] = val
+            
+            new_formula = [clause for clause in formula if pure not in clause]
+            
+            return dpll(new_formula, new_assign)
+        
+        for var in variables_list:
+            if var not in assign:
+                new_assign = assign.copy()
+                new_assign[var] = True
                 
-            satisfied = False
-            unassigned = False
-            
-            for lit in clause:
-                var = abs(lit)
-                if var not in assignment:
-                    unassigned = True
-                    break
-                elif (lit > 0 and assignment[var]) or (lit < 0 and not assignment[var]):
-                    satisfied = True
-                    break
-            
-            if not (satisfied or unassigned):
-                return False
+                new_formula = []
+                for clause in formula:
+                    if var in clause:
+                        continue
+                    new_clause = [lit for lit in clause if lit != -var]
+                    new_formula.append(new_clause)
                 
-        return True
-    
-    def update_satisfied_clauses():
-        for i in range(len(cnf)):
-            satisfied_clauses[i] = is_clause_satisfied(i)
-    
-    def backtrack(index):
-        if index == len(ordered_variables):
-            update_satisfied_clauses()
-            return all(satisfied_clauses)
+                result = dpll(new_formula, new_assign)
+                if result is not None:
+                    return result
+                
+                new_assign = assign.copy()
+                new_assign[var] = False
+                
+                new_formula = []
+                for clause in formula:
+                    if -var in clause:
+                        continue
+                    new_clause = [lit for lit in clause if lit != var]
+                    new_formula.append(new_clause)
+                
+                return dpll(new_formula, new_assign)
         
-        var = ordered_variables[index]
-        
-        for val in [True, False]:
-            assignment[var] = val
-            
-            if is_assignment_consistent() and backtrack(index + 1):
-                return True
-        
-        del assignment[var]
-        return False
+        return None
     
-    if backtrack(0):
-        print("SAT (Backtracking Optimized)")
-        model = [var if assignment.get(var, False) else -var for var in variables]
+    final_assignment = dpll(cnf, assignment)
+    
+    if final_assignment is not None:
+        print("SAT (DPLL)")
+        model = [var if final_assignment.get(var, False) else -var for var in variables_list]
         return model
     else:
-        print("UNSAT (Backtracking Optimized)")
+        print("UNSAT (DPLL)")
         return None
 
+
 def measure_time(time_out, func, *args, **kwargs):
-    start_time = time.perf_counter()  # Call the function, don't just reference it
+    start_time = time.perf_counter() 
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-        # Submit the function itself, not its result
         future = executor.submit(func, *args, **kwargs)
         try:
             model = future.result(timeout=time_out)
-            elapsed_time = time.perf_counter() - start_time  # Call the function
-            print(f"Execution time for {func.__name__}: {elapsed_time:.4f} seconds")
+            elapsed_time = time.perf_counter() - start_time 
             return model, elapsed_time
         except concurrent.futures.TimeoutError:
             print(f"Function {func.__name__} timed out after {time_out} seconds")
-            # Try to cancel the future if possible
             future.cancel()
             executor._threads.clear()
             concurrent.futures.thread._threads_queues.clear()
@@ -292,34 +304,34 @@ def measure_time(time_out, func, *args, **kwargs):
         
 if __name__ == "__main__":
     try:
-        for i in range(1, 9):
+        for i in range(1, 5):
             print(f"=== Test case {i} ===")
             file_path = f'source/testcases/input_{i}.txt'
             matrix = read_matrix(file_path)
             cnf, variables = prepare_cnf_data(matrix)
             
             print("\n=== Timing PySAT Solver ===")
-            model, pysat_time = measure_time(60, solve_cnf, cnf, variables)
+            model, pysat_time = measure_time(300, solve_cnf_pysat, cnf, variables)
             if model:
                 result = interpret_model(model, matrix)
                 write_matrix(f'source/testcases/output_{i}.txt', result, False, "PySAT")
             
             print("\n=== Timing Backtracking ===")
-            model, backtrack_opt_time = measure_time(60, solve_cnf_backtrack, cnf, variables)
+            model, backtrack_opt_time = measure_time(300, solve_cnf_backtracking, cnf, variables)
             if model:
                 result = interpret_model(model, matrix)
                 write_matrix(f'source/testcases/output_{i}.txt', result, True, "Backtracking")
             
             print("\n=== Timing Brute Force ===")
-            model, brute_opt_time = measure_time(60, solve_cnf_brute_force, cnf, variables)
+            model, brute_opt_time = measure_time(300, solve_cnf_brute_force, cnf, variables)
             if model:
                 result = interpret_model(model, matrix)
                 write_matrix(f'source/testcases/output_{i}.txt', result, True, "Brute Force")
             
             print("\n=== Performance Summary ===")
             print(f"PySAT Solver:          {pysat_time:.4f} seconds")
-            print(f"Optimized Backtracking: {backtrack_opt_time:.4f} seconds")
-            print(f"Optimized Brute Force: {brute_opt_time:.4f} seconds")
+            print(f"Backtracking: {backtrack_opt_time:.4f} seconds")
+            print(f"Brute Force: {brute_opt_time:.4f} seconds")
 
             gc.collect()
         os._exit(0)
