@@ -8,7 +8,7 @@ header_font = pygame.font.Font('assets/text/Emulogic-zrEw.ttf', 32)
 small_font = pygame.font.Font('assets/text/Emulogic-zrEw.ttf', 10)
 
 class Button:
-    def __init__(self, x, y, width, height, text, color=pygame.Color('blue'), hover_color=pygame.Color('darkgray'), text_color=pygame.Color('white')):
+    def __init__(self, x, y, width, height, text, color=pygame.Color('purple'), hover_color=pygame.Color('darkgray'), text_color=pygame.Color('white')):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.color = color
@@ -19,7 +19,7 @@ class Button:
     def draw(self, surface):
         color = self.hover_color if self.is_hovered else self.color
         pygame.draw.rect(surface, color, self.rect)
-        pygame.draw.rect(surface, 'black', self.rect, 2)  # Border
+        pygame.draw.rect(surface, 'black', self.rect, 2)
         
         text_surface = normal_font.render(self.text, True, self.text_color)
         text_rect = text_surface.get_rect(center=self.rect.center)
@@ -49,12 +49,10 @@ class Cell:
             self.rect.width,
             self.rect.height
         )
-        
-        # Draw cell background
+       
         if not self.revealed:
             if self.flagged:
-                pygame.draw.rect(surface, 'yellow', draw_rect)  # Flagged cells are yellow
-                # Optional: Draw a flag symbol
+                pygame.draw.rect(surface, 'yellow', draw_rect)
                 flag_font = pygame.font.SysFont('Arial', int(self.size * 0.7))
                 flag_text = flag_font.render('F', True, 'red')
                 flag_rect = flag_text.get_rect(center=(
@@ -65,19 +63,18 @@ class Cell:
             else:
                 pygame.draw.rect(surface, 'gray', draw_rect)
         else:
-            if self.value == 'G':  # Gem
+            if self.value == 'G':  
                 pygame.draw.rect(surface, 'green', draw_rect)
-            elif self.value == 'T':  # Trap
+            elif self.value == 'T': 
                 pygame.draw.rect(surface, 'red', draw_rect)
             elif isinstance(self.value, int):
                 pygame.draw.rect(surface, 'white', draw_rect)
             else:
                 pygame.draw.rect(surface, 'white', draw_rect)
         
-        # Draw border
+      
         pygame.draw.rect(surface, 'black', draw_rect, 1)
         
-        # Draw value if revealed
         if self.revealed and isinstance(self.value, int) and self.value != 0:
             text = normal_font.render(str(self.value), False, 'black')
             text_rect = text.get_rect(center=draw_rect.center)
@@ -99,7 +96,7 @@ class Game:
         self.state = "intro"
         self.cell_size = 32
         self.cells = []
-        self.level = 8
+        self.level = 1
         self.screen_width = 500
         self.screen_height = 500
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
@@ -118,12 +115,12 @@ class Game:
         self.quit_button = Button(self.screen_width//2 - 100, 350, 200, 60, "Quit")
         
     def generate_level(self):
-        if self.level >= 5:
+        if self.level >= 3:
             algorithm = random.choice([solve_cnf_pysat, solve_cnf_backtracking])
         else:
             algorithm = random.choice([solve_cnf_pysat, solve_cnf_backtracking, solve_cnf_brute_force])
         self.loading_message = f"Generating puzzle using {algorithm.__name__}..."
-        if self.level == 8:
+        if self.level == 4:
             self.cell_size = 16
         self.state = "loading"
         self.cells = []
@@ -141,7 +138,6 @@ class Game:
             self.matrix = interpret_model(model, self.matrix)
             self.cells = [[Cell(i, j, self.cell_size, self.matrix[i][j]) for j in range(len(self.matrix[0]))] for i in range(len(self.matrix))]
             
-            # Count total gems for win condition
             self.total_gems = sum(1 for row in self.cells for cell in row if cell.value == 'G')
             self.revealed_gems = 0
             
@@ -154,7 +150,6 @@ class Game:
     def menu_scene(self):
         self.screen.fill('black')
         
-        # Draw title
         title_text = header_font.render("Gem Hunter", True, 'white')
         title_rect = title_text.get_rect(center=(self.screen_width//2, 150))
         self.screen.blit(title_text, title_rect)
@@ -168,7 +163,7 @@ class Game:
                 self.state = "quit"
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.start_button.is_clicked(pygame.mouse.get_pos(), True):
-                    self.level = 8
+                    self.level = 1
                     self.generate_level()
                 if self.quit_button.is_clicked(pygame.mouse.get_pos(), True):
                     self.state = "quit"
@@ -179,27 +174,22 @@ class Game:
     def playing_scene(self):
         self.screen.fill('black')
         
-        # Draw level indicator - adjust position for better alignment
         level_text = normal_font.render(f"LEVEL: {self.level}", True, 'white')
         level_rect = level_text.get_rect(topleft=(50, 20))
         self.screen.blit(level_text, level_rect)
         
-        # Draw gem counter - adjust position for better alignment
         gem_text = normal_font.render(f"GEMS: {self.revealed_gems}/{self.total_gems}", True, 'white')
         gem_rect = gem_text.get_rect(topright=(self.screen_width - 50, 20))
         self.screen.blit(gem_text, gem_rect)
         
-        # Calculate grid offset to center it
         grid_width = len(self.cells[0]) * self.cell_size
         grid_height = len(self.cells) * self.cell_size
         offset_x = (self.screen_width - grid_width) // 2
-        offset_y = (self.screen_height - grid_height) // 2 + 10  # Add more space for the header
+        offset_y = (self.screen_height - grid_height) // 2 + 10 
         
-        # Draw cells
         for row in self.cells:
             for cell in row:
                 cell.draw(self.screen, offset_x, offset_y)
-
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -211,7 +201,7 @@ class Game:
                             if cell.is_clicked(pygame.mouse.get_pos(), offset_x, offset_y):
                                 if not cell.revealed:
                                     if cell.value == 'T':
-                                        cell.revealed = True  # Reveal the trap
+                                        cell.revealed = True 
                                         self.lose_sound.play()
                                         self.state = "lose"
                                     elif cell.value == 'G':
@@ -229,10 +219,9 @@ class Game:
                     for row in self.cells:
                         for cell in row:
                             if cell.is_clicked(mouse_pos, offset_x, offset_y):
-                                if not cell.revealed:  # Only allow flagging unrevealed cells
+                                if not cell.revealed:
                                     cell.flagged = not cell.flagged
             
-            # Uncomment for testing - press SPACE to skip level
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.level += 1
@@ -289,9 +278,6 @@ class Game:
         self.screen.blit(text, text_rect)
         
         pygame.display.flip()
-        # pygame.time.wait(10000)  # Show loading message for 1 second
-        
-        # Try to generate the level again
         self.generate_level()
     
     def quit_scene(self):
@@ -316,7 +302,7 @@ class Game:
                 self.loading_scene()
                 
             pygame.display.flip()
-            clock.tick(60)  # Limit to 60 FPS
+            clock.tick(60) 
         
         self.quit_scene()
 
