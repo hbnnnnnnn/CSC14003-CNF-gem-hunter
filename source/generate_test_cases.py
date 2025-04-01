@@ -40,13 +40,13 @@ def create_test_case(size):
     is_solvable = clue_count >= size
     return puzzle, solution, is_solvable, clue_count, number_cells_count, visibility_percentage
 
-def save_test_case(puzzle, solution, puzzle_file, solution_file):
+def save_test_case(puzzle, puzzle_file):
     with open(puzzle_file, 'w') as f:
         for row in puzzle:
             f.write(', '.join(row) + '\n')
-    with open(solution_file, 'w') as f:
-        for row in solution:
-            f.write(', '.join(row) + '\n')
+    # with open(solution_file, 'w') as f:
+    #     for row in solution:
+    #         f.write(', '.join(row) + '\n')
 
 os.makedirs('source/testcases', exist_ok=True)
 
@@ -70,12 +70,7 @@ for i, size in enumerate(sizes, 1):
         print("\nPuzzle (first 5 rows):")
         for row in best_puzzle[:min(5, size)]:
             print(', '.join(row))
-        print("\nSolution (first 5 rows):")
-        for row in best_solution[:min(5, size)]:
-            print(', '.join(row))
         puzzle_file = f"source/testcases/input_{i}.txt"
-        solution_file = f"source/testcases/output_{i}.txt"
-        save_test_case(best_puzzle, best_solution, puzzle_file, solution_file)
-        print(f"Saved to {puzzle_file} and {solution_file}")
+        save_test_case(best_puzzle, puzzle_file)
     else:
         print(f"Failed to create a good {size}x{size} test case")
