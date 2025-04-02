@@ -24,19 +24,19 @@ This project focuses on modeling logic-based puzzles using Conjunctive Normal Fo
 3. Requirements:
     python 3.12.4
     pip (latest version recommended)
-3. Install dependencies:
+4. Install dependencies:
     ```bash
     pip install -r requirements.txt
     ```
-4. Run the CNF performance test:
+5. Run the CNF performance test:
     ```bash
     Run main.py by using command python .\source\main.py.
     ```
-5. Launch the game:
+6. Launch the game:
     ```bash
     Run gem_hunter.py by using command python .\source\gem_hunter.py.
     ```
-6. Project structure
+7. Project structure CSC14003-CNF-gem-hunter ...
 CSC14003-CNF-gem-hunter/
 ├── assets/                 # Game assets 
 |   ├──sounds/
