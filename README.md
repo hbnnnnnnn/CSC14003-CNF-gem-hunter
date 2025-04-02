@@ -36,17 +36,7 @@ This project focuses on modeling logic-based puzzles using Conjunctive Normal Fo
     ```bash
     Run gem_hunter.py by using command python .\source\gem_hunter.py.
     ```
-7. Project structure CSC14003-CNF-gem-hunter ...
-CSC14003-CNF-gem-hunter/
-├── assets/                 # Game assets 
-|   ├──sounds/
-|   ├──text/
-├── source/                 # Source code
-│   ├── gem_hunter.py       # Main game logic
-│   ├── main.py             # CNF solver performance test
-│   ├── generate_test_cases.py
-│   └── testcases/          # CNF input/output test files
-├── requirements.txt        # Project dependencies
-├── README.md               # Project documentation
-└── .gitignore              # Git ignored files
-
+## Project Structure
+```
+CSC14003-CNF-gem-hunter/ ├── assets/ # Game assets │ ├── sounds/ │ └── text/ ├── source/ # Source code │ ├── gem_hunter.py # Game logic (visual interface) │ ├── main.py # CNF solver performance test │ ├── generate_test_cases.py │ └── testcases/ # CNF input/output test files ├── requirements.txt # Project dependencies ├── README.md # Project documentation └── .gitignore # Git ignored files
+```
