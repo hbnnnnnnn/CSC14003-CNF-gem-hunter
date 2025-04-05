@@ -48,7 +48,7 @@ def save_test_case(puzzle, puzzle_file):
     #     for row in solution:
     #         f.write(', '.join(row) + '\n')
 
-os.makedirs('source/testcases', exist_ok=True)
+os.makedirs('Source code/testcases/input', exist_ok=True)
 
 sizes = [5, 8, 11, 20]
 for i, size in enumerate(sizes, 1):
@@ -70,7 +70,7 @@ for i, size in enumerate(sizes, 1):
         print("\nPuzzle (first 5 rows):")
         for row in best_puzzle[:min(5, size)]:
             print(', '.join(row))
-        puzzle_file = f"source/testcases/input_{i}.txt"
+        puzzle_file = f"Source code/testcases/input/input_{i}.txt"
         save_test_case(best_puzzle, puzzle_file)
     else:
         print(f"Failed to create a good {size}x{size} test case")

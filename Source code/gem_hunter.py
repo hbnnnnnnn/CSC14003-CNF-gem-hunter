@@ -3,9 +3,9 @@ import random
 from main import read_matrix, prepare_cnf_data, solve_cnf_pysat, solve_cnf_backtracking, solve_cnf_brute_force, interpret_model
 pygame.init()
 pygame.mixer.init()
-normal_font = pygame.font.Font('assets/text/Emulogic-zrEw.ttf', 12)
-header_font = pygame.font.Font('assets/text/Emulogic-zrEw.ttf', 32)
-small_font = pygame.font.Font('assets/text/Emulogic-zrEw.ttf', 10)
+normal_font = pygame.font.Font('Source code/assets/text/Emulogic-zrEw.ttf', 12)
+header_font = pygame.font.Font('Source code/assets/text/Emulogic-zrEw.ttf', 32)
+small_font = pygame.font.Font('Source code/assets/text/Emulogic-zrEw.ttf', 10)
 
 class Button:
     def __init__(self, x, y, width, height, text, color=pygame.Color('purple'), hover_color=pygame.Color('darkgray'), text_color=pygame.Color('white')):
@@ -102,10 +102,10 @@ class Game:
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Gem Hunter")
         
-        self.hint_sound = pygame.mixer.Sound('assets/sounds/hint.wav')
-        self.win_sound = pygame.mixer.Sound('assets/sounds/win.mp3')
-        self.lose_sound = pygame.mixer.Sound('assets/sounds/lose.mp3')
-        self.bgm = pygame.mixer.Sound('assets/sounds/bgm.mp3')
+        self.hint_sound = pygame.mixer.Sound('Source code/assets/sounds/hint.wav')
+        self.win_sound = pygame.mixer.Sound('Source code/assets/sounds/win.mp3')
+        self.lose_sound = pygame.mixer.Sound('Source code/assets/sounds/lose.mp3')
+        self.bgm = pygame.mixer.Sound('Source code/assets/sounds/bgm.mp3')
         
         self.total_gems = 0
         self.revealed_gems = 0
@@ -126,7 +126,7 @@ class Game:
         self.cells = []
         
         try:
-            self.matrix = read_matrix(f"source/testcases/input_{self.level}.txt")
+            self.matrix = read_matrix(f"Source code/testcases/input/input_{self.level}.txt")
             cnf, variables = prepare_cnf_data(self.matrix)
             model = algorithm(cnf, variables)
             

@@ -146,7 +146,6 @@ def solve_cnf_brute_force(cnf, variables):
             
             all_satisfied = True
             
-            # Iterate through clauses correctly
             for i, clause in enumerate(cnf):
                 clause_satisfied = False
                 for literal in clause:
@@ -307,7 +306,7 @@ if __name__ == "__main__":
     try:
         for i in range(1, 5):
             print(f"=== Test case {i} ===")
-            file_path = f'source/testcases/input_{i}.txt'
+            file_path = f'Source code/testcases/input/input_{i}.txt'
             matrix = read_matrix(file_path)
             cnf, variables = prepare_cnf_data(matrix)
             
@@ -315,19 +314,19 @@ if __name__ == "__main__":
             model, pysat_time = measure_time(300, solve_cnf_pysat, cnf, variables)
             if model:
                 result = interpret_model(model, matrix)
-                write_matrix(f'source/testcases/output_{i}.txt', result, False, "PySAT")
+                write_matrix(f'Source code/testcases/output/output_{i}.txt', result, False, "PySAT")
             
             print("\n=== Timing Backtracking ===")
             model, backtrack_opt_time = measure_time(300, solve_cnf_backtracking, cnf, variables)
             if model:
                 result = interpret_model(model, matrix)
-                write_matrix(f'source/testcases/output_{i}.txt', result, True, "Backtracking")
+                write_matrix(f'Source code/testcases/output/output_{i}.txt', result, True, "Backtracking")
             
             print("\n=== Timing Brute Force ===")
             model, brute_opt_time = measure_time(300, solve_cnf_brute_force, cnf, variables)
             if model:
                 result = interpret_model(model, matrix)
-                write_matrix(f'source/testcases/output_{i}.txt', result, True, "Brute Force")
+                write_matrix(f'Source code/testcases/output/output_{i}.txt', result, True, "Brute Force")
             
             print("\n=== Performance Summary ===")
             print(f"PySAT Solver:          {pysat_time:.4f} seconds")
