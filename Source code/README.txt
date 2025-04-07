@@ -14,30 +14,21 @@ This project focuses on modeling logic-based puzzles using Conjunctive Normal Fo
 ## Installation
 
 1. Clone the repository:
-    ```bash
     git clone https://github.com/hbnnnnnnn/CSC14003-CNF-gem-hunter
-    ```
 2. Navigate to the project directory:
-    ```bash
     cd CSC14003-CNF-gem-hunter
-    ```
 3. Requirements:
     python 3.12.4
     pip (latest version recommended)
 4. Install dependencies:
-    ```bash
     pip install -r "Source code/requirements.txt"
-    ```
 5. Run the CNF performance test:
-    ```bash
     Run main.py by using command python "./Source code/main.py"
-    ```
 6. Launch the game:
-    ```bash
     Run gem_hunter.py by using command python "./Source code/gem_hunter.py"
-    ```
+
 ## Project Structure
-```
+
 23127300/
 │
 ├── Source code/                # Root source directory
@@ -52,9 +43,8 @@ This project focuses on modeling logic-based puzzles using Conjunctive Normal Fo
 │   ├── gem_hunter.py           # Main game logic 
 │   ├── main.py                 # CNF algorithms and solver performance evaluation 
 │   ├── generate_test_cases.py  # Script for generating CNF test cases
-│   ├── README.md               # Project description and instructions
+│   ├── README.txt              # Project description and instructions
 │   └── requirements.txt        # Python dependencies for the project
 │
 ├── Report.pdf                  # Project report
 └── [Video Demo]                # Link included in the report
-```
