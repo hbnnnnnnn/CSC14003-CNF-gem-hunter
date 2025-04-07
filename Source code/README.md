@@ -30,11 +30,11 @@ This project focuses on modeling logic-based puzzles using Conjunctive Normal Fo
     ```
 5. Run the CNF performance test:
     ```bash
-    Run main.py by using command python ".\Source code\main.py"
+    Run main.py by using command python "./Source code/main.py"
     ```
 6. Launch the game:
     ```bash
-    Run gem_hunter.py by using command python ".\Source code\gem_hunter.py"
+    Run gem_hunter.py by using command python "./Source code/gem_hunter.py"
     ```
 ## Project Structure
 ```
