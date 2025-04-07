@@ -8,7 +8,7 @@ header_font = pygame.font.Font('Source code/assets/text/Emulogic-zrEw.ttf', 32)
 small_font = pygame.font.Font('Source code/assets/text/Emulogic-zrEw.ttf', 10)
 
 class Button:
-    def __init__(self, x, y, width, height, text, color=pygame.Color('purple'), hover_color=pygame.Color('darkgray'), text_color=pygame.Color('white')):
+    def __init__(self, x, y, width, height, text, color=pygame.Color('purple'), hover_color=pygame.Color('lavender'), text_color=pygame.Color('white')):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.color = color
@@ -61,14 +61,14 @@ class Cell:
                 ))
                 surface.blit(flag_text, flag_rect)
             else:
-                pygame.draw.rect(surface, 'gray', draw_rect)
+                pygame.draw.rect(surface, 'darkgray', draw_rect)
         else:
             if self.value == 'G':  
                 pygame.draw.rect(surface, 'green', draw_rect)
             elif self.value == 'T': 
                 pygame.draw.rect(surface, 'red', draw_rect)
             elif isinstance(self.value, int):
-                pygame.draw.rect(surface, 'white', draw_rect)
+                pygame.draw.rect(surface, 'lavender', draw_rect)
             else:
                 pygame.draw.rect(surface, 'white', draw_rect)
         
@@ -136,8 +136,18 @@ class Game:
                 return
                 
             self.matrix = interpret_model(model, self.matrix)
-            self.cells = [[Cell(i, j, self.cell_size, self.matrix[i][j]) for j in range(len(self.matrix[0]))] for i in range(len(self.matrix))]
-            
+            # self.cells = [[Cell(i, j, self.cell_size, self.matrix[i][j]) for j in range(len(self.matrix[0]))] for i in range(len(self.matrix))]
+            # self.cells = []
+            for i in range(len(self.matrix)):
+                row = []
+                for j in range(len(self.matrix[0])):
+                    value = self.matrix[i][j]
+                    cell = Cell(i, j, self.cell_size, value)
+                    if isinstance(value, int): 
+                        cell.revealed = True
+                    row.append(cell)
+                self.cells.append(row)
+
             self.total_gems = sum(1 for row in self.cells for cell in row if cell.value == 'G')
             self.revealed_gems = 0
             
