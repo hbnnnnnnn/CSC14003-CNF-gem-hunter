@@ -309,24 +309,27 @@ if __name__ == "__main__":
             file_path = f'Source code/testcases/input/input_{i}.txt'
             matrix = read_matrix(file_path)
             cnf, variables = prepare_cnf_data(matrix)
+            pysat_result = []
             
             print("\n=== Timing PySAT Solver ===")
             model, pysat_time = measure_time(300, solve_cnf_pysat, cnf, variables)
             if model:
-                result = interpret_model(model, matrix)
-                write_matrix(f'Source code/testcases/output/output_{i}.txt', result, False, "PySAT")
+                pysat_result = interpret_model(model, matrix)
+                write_matrix(f'Source code/testcases/output/output_{i}.txt', pysat_result, False)
             
             print("\n=== Timing Backtracking ===")
             model, backtrack_opt_time = measure_time(300, solve_cnf_backtracking, cnf, variables)
             if model:
                 result = interpret_model(model, matrix)
-                write_matrix(f'Source code/testcases/output/output_{i}.txt', result, True, "Backtracking")
+                if result != pysat_result:
+                    write_matrix(f'Source code/testcases/output/output_{i}.txt', result, True, "Backtracking")
             
             print("\n=== Timing Brute Force ===")
             model, brute_opt_time = measure_time(300, solve_cnf_brute_force, cnf, variables)
             if model:
                 result = interpret_model(model, matrix)
-                write_matrix(f'Source code/testcases/output/output_{i}.txt', result, True, "Brute Force")
+                if result != pysat_result:
+                    write_matrix(f'Source code/testcases/output/output_{i}.txt', result, True, "Brute Force")
             
             print("\n=== Performance Summary ===")
             print(f"PySAT Solver:          {pysat_time:.4f} seconds")
